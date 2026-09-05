@@ -1,0 +1,15 @@
+# OS / Tools
+.DS_Store
+Thumbs.db
+*.log
+
+# WorkBuddy / IDE
+.workbuddy/
+.vscode/
+.idea/
+
+# Node
+node_modules/
+
+# Logs / Temp
+uploadError.txt

@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1510" viewBox="0 0 1000 1510" font-family="Microsoft YaHei, PingFang SC, Hiragino Sans GB, sans-serif">
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#546E7A"/></marker></defs>
+<rect width="1000" height="1510" fill="#FFFFFF"/>
+<text x="500" y="32" text-anchor="middle" font-size="20" font-weight="bold" fill="#263238">废品简易账本 · 项目流程图</text>
+<rect x="230.0" y="50.0" width="220" height="48" rx="24" fill="#37474F" stroke="#37474F" stroke-width="1.8"/>
+<text x="340" y="79" text-anchor="middle" font-size="14" fill="#FFFFFF">小程序启动 onLaunch</text>
+<rect x="220.0" y="121.0" width="240" height="56" rx="10" fill="#E3F2FD" stroke="#1565C0" stroke-width="1.8"/>
+<text x="340" y="146" text-anchor="middle" font-size="14" fill="#263238">wx.cloud.init</text>
+<text x="340" y="166" text-anchor="middle" font-size="14" fill="#263238">初始化云环境</text>
+<polygon points="340,209.0 435.0,249 340,289.0 245.0,249" fill="#FFF8E1" stroke="#F9A825" stroke-width="1.8"/>
+<text x="340" y="254" text-anchor="middle" font-size="14" fill="#5D4037">云开发可用？</text>
+<rect x="520.0" y="221.0" width="200" height="56" rx="10" fill="#ECEFF1" stroke="#546E7A" stroke-width="1.8"/>
+<text x="620" y="246" text-anchor="middle" font-size="14" fill="#263238">本地模式</text>
+<text x="620" y="266" text-anchor="middle" font-size="14" fill="#263238">读取本地存储数据</text>
+<rect x="220.0" y="321.0" width="240" height="56" rx="10" fill="#E3F2FD" stroke="#1565C0" stroke-width="1.8"/>
+<text x="340" y="346" text-anchor="middle" font-size="14" fill="#263238">读取云端配置</text>
+<text x="340" y="366" text-anchor="middle" font-size="14" fill="#263238">user_data 集合</text>
+<polygon points="340,404.0 435.0,444 340,484.0 245.0,444" fill="#FFF8E1" stroke="#F9A825" stroke-width="1.8"/>
+<text x="340" y="449" text-anchor="middle" font-size="14" fill="#5D4037">云端有数据？</text>
+<rect x="520.0" y="416.0" width="200" height="56" rx="10" fill="#ECEFF1" stroke="#546E7A" stroke-width="1.8"/>
+<text x="620" y="441" text-anchor="middle" font-size="14" fill="#263238">读取本地数据</text>
+<text x="620" y="461" text-anchor="middle" font-size="14" fill="#263238">并上传云端初始化</text>
+<rect x="220.0" y="516.0" width="240" height="56" rx="10" fill="#E3F2FD" stroke="#1565C0" stroke-width="1.8"/>
+<text x="340" y="541" text-anchor="middle" font-size="14" fill="#263238">加载配置与单价</text>
+<text x="340" y="561" text-anchor="middle" font-size="14" fill="#263238">拉取云端历史记录</text>
+<polygon points="340,599.0 425.0,639 340,679.0 255.0,639" fill="#FFF8E1" stroke="#F9A825" stroke-width="1.8"/>
+<text x="340" y="644" text-anchor="middle" font-size="14" fill="#5D4037">首次使用？</text>
+<rect x="520.0" y="611.0" width="200" height="56" rx="10" fill="#ECEFF1" stroke="#546E7A" stroke-width="1.8"/>
+<text x="620" y="636" text-anchor="middle" font-size="14" fill="#263238">播放新手教程</text>
+<text x="620" y="656" text-anchor="middle" font-size="14" fill="#263238">7 步语音引导</text>
+<rect x="240.0" y="715.0" width="200" height="48" rx="24" fill="#C8E6C9" stroke="#2E7D32" stroke-width="1.8"/>
+<text x="340" y="744" text-anchor="middle" font-size="14" fill="#263238">进入记账主页</text>
+<rect x="220.0" y="796.0" width="240" height="56" rx="10" fill="#E8F5E9" stroke="#2E7D32" stroke-width="1.8"/>
+<text x="340" y="829" text-anchor="middle" font-size="14" fill="#263238">选择 / 新增顾客标签</text>
+<rect x="220.0" y="881.0" width="240" height="56" rx="10" fill="#E8F5E9" stroke="#2E7D32" stroke-width="1.8"/>
+<text x="340" y="906" text-anchor="middle" font-size="14" fill="#263238">点击品类卡片</text>
+<text x="340" y="926" text-anchor="middle" font-size="14" fill="#263238">唤起称重计算器</text>
+<rect x="220.0" y="966.0" width="240" height="56" rx="10" fill="#E8F5E9" stroke="#2E7D32" stroke-width="1.8"/>
+<text x="340" y="991" text-anchor="middle" font-size="14" fill="#263238">输入重量（支持算式）</text>
+<text x="340" y="1011" text-anchor="middle" font-size="14" fill="#263238">可临时调价</text>
+<rect x="220.0" y="1051.0" width="240" height="56" rx="10" fill="#E8F5E9" stroke="#2E7D32" stroke-width="1.8"/>
+<text x="340" y="1084" text-anchor="middle" font-size="14" fill="#263238">加入当前交易清单</text>
+<polygon points="340,1134.0 445.0,1174 340,1214.0 235.0,1174" fill="#FFF8E1" stroke="#F9A825" stroke-width="1.8"/>
+<text x="340" y="1171" text-anchor="middle" font-size="14" fill="#5D4037">继续添加或</text>
+<text x="340" y="1191" text-anchor="middle" font-size="14" fill="#5D4037">切换顾客？</text>
+<rect x="220.0" y="1246.0" width="240" height="56" rx="10" fill="#FFF3E0" stroke="#E65100" stroke-width="1.8"/>
+<text x="340" y="1271" text-anchor="middle" font-size="14" fill="#263238">确认结算并入账</text>
+<text x="340" y="1291" text-anchor="middle" font-size="14" fill="#263238">（语音播报 + 震动）</text>
+<rect x="220.0" y="1331.0" width="240" height="56" rx="10" fill="#FFF3E0" stroke="#E65100" stroke-width="1.8"/>
+<text x="340" y="1356" text-anchor="middle" font-size="14" fill="#263238">写入历史，同步云端</text>
+<text x="340" y="1376" text-anchor="middle" font-size="14" fill="#263238">自动补充新顾客位</text>
+<rect x="220.0" y="1421.0" width="240" height="56" rx="10" fill="#FFF3E0" stroke="#E65100" stroke-width="1.8"/>
+<text x="340" y="1446" text-anchor="middle" font-size="14" fill="#263238">历史账本</text>
+<text x="340" y="1466" text-anchor="middle" font-size="14" fill="#263238">业绩 / 撤销 / 复制发微信</text>
+<rect x="520.0" y="796.0" width="200" height="56" rx="10" fill="#F3E5F5" stroke="#6A1B9A" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="620" y="821" text-anchor="middle" font-size="14" fill="#263238">设置</text>
+<text x="620" y="841" text-anchor="middle" font-size="14" fill="#263238">单位 / 字体 / 语音</text>
+<rect x="520.0" y="881.0" width="200" height="56" rx="10" fill="#F3E5F5" stroke="#6A1B9A" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="620" y="906" text-anchor="middle" font-size="14" fill="#263238">品类管理</text>
+<text x="620" y="926" text-anchor="middle" font-size="14" fill="#263238">改价 / 删除 / 新增</text>
+<rect x="600.0" y="1198.0" width="300" height="104" rx="10" fill="#FAFAFA" stroke="#B0BEC5" stroke-width="1.8" stroke-dasharray="6 4"/>
+<text x="750" y="1237" text-anchor="middle" font-size="12" fill="#546E7A">数据存储</text>
+<text x="750" y="1257" text-anchor="middle" font-size="12" fill="#546E7A">本地 Storage 缓存</text>
+<text x="750" y="1277" text-anchor="middle" font-size="12" fill="#546E7A">云端 user_data（配置）</text>
+<text x="750" y="1297" text-anchor="middle" font-size="12" fill="#546E7A">云端 history_bills（账单）</text>
+<polyline points="340,98 340,121" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="340,177 340,209" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="340,289 340,321" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="354" y="309" text-anchor="middle" font-size="13" fill="#37474F" style="paint-order:stroke" stroke="#FFFFFF" stroke-width="4">是</text>
+<polyline points="435,249 520,249" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="472" y="237" text-anchor="middle" font-size="13" fill="#37474F" style="paint-order:stroke" stroke="#FFFFFF" stroke-width="4">否 / 失败</text>
+<polyline points="340,377 340,404" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="340,484 340,516" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="354" y="504" text-anchor="middle" font-size="13" fill="#37474F" style="paint-order:stroke" stroke="#FFFFFF" stroke-width="4">有</text>
+<polyline points="435,444 520,444" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="472" y="432" text-anchor="middle" font-size="13" fill="#37474F" style="paint-order:stroke" stroke="#FFFFFF" stroke-width="4">无</text>
+<polyline points="340,572 340,599" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="340,679 340,715" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="354" y="695" text-anchor="middle" font-size="13" fill="#37474F" style="paint-order:stroke" stroke="#FFFFFF" stroke-width="4">否</text>
+<polyline points="430,639 520,639" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="470" y="627" text-anchor="middle" font-size="13" fill="#37474F" style="paint-order:stroke" stroke="#FFFFFF" stroke-width="4">是</text>
+<polyline points="720,249 800,249 800,739 440,739" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="620,472 620,544 460,544" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="620,667 620,704 340,704" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="340,763 340,796" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="340,852 340,881" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="340,937 340,966" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="340,1022 340,1051" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="340,1107 340,1134" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="340,1214 340,1246" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="354" y="1234" text-anchor="middle" font-size="13" fill="#37474F" style="paint-order:stroke" stroke="#FFFFFF" stroke-width="4">否</text>
+<polyline points="235,1174 90,1174 90,824 220,824" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<text x="213" y="1162" text-anchor="middle" font-size="13" fill="#37474F" style="paint-order:stroke" stroke="#FFFFFF" stroke-width="4">是</text>
+<polyline points="340,1302 340,1331" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="340,1387 340,1421" fill="none" stroke="#546E7A" stroke-width="1.8" marker-end="url(#arr)"/>
+<polyline points="460,824 520,824" fill="none" stroke="#6A1B9A" stroke-width="1.8" stroke-dasharray="7 5"/>
+<polyline points="460,909 520,909" fill="none" stroke="#6A1B9A" stroke-width="1.8" stroke-dasharray="7 5"/>
+<text x="48" y="400" text-anchor="middle" font-size="13" fill="#90A4A9" letter-spacing="3" transform="rotate(-90 48 400)">启动与初始化</text>
+<text x="48" y="1000" text-anchor="middle" font-size="13" fill="#90A4A9" letter-spacing="3" transform="rotate(-90 48 1000)">记账主流程</text>
+<text x="48" y="1360" text-anchor="middle" font-size="13" fill="#90A4A9" letter-spacing="3" transform="rotate(-90 48 1360)">结算与历史</text>
+</svg>

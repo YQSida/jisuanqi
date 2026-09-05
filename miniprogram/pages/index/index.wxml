@@ -1,0 +1,350 @@
+<!-- 整个页面的容器，用于支持全局变量注入 -->
+<view class="container" style="--font-scale: {{fontScale}}; padding-top: calc(env(safe-area-inset-top) + 10px); padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));">
+    
+    <!-- 云端同步加载中遮罩 -->
+    <view class="cloud-loading-overlay" wx:if="{{isCloudSyncing}}">
+        <view class="loading-spinner"></view>
+        <view class="loading-text">正在与云端同步数据...</view>
+    </view>
+
+    <!-- 记账区(默认) -->
+    <block wx:if="{{activePage === 'book' && !isCloudSyncing}}">
+        <!-- 顶部分类栏与操作按钮 -->
+        <view class="top-nav-bar">
+            <!-- 并发顾客标签 -->
+            <scroll-view id="customer-tabs" scroll-x enable-flex enhanced="{{true}}" show-scrollbar="{{false}}" class="customer-tabs" scroll-into-view="{{'tab-' + activeCustomerId}}">
+                <view class="tab-item {{item.id === activeCustomerId ? 'active' : ''}}" 
+                      wx:for="{{customers}}" 
+                      wx:key="id" 
+                      id="tab-{{item.id}}"
+                      bindtap="switchCustomer" 
+                      data-id="{{item.id}}">
+                    {{item.name}}
+                    <view class="has-items-dot" wx:if="{{item.invoice.length > 0 || item.inputFormula || item.formulas[item.id]}}"></view>
+                </view>
+                <view class="tab-add-btn" bindtap="openAddCustomerModal">+</view>
+            </scroll-view>
+            
+            <view class="nav-right-actions">
+                <button class="action-btn share-btn" open-type="share">📤</button>
+                <view class="action-btn" bindtap="openSettingsModal">⚙️</view>
+            </view>
+        </view>
+
+        <view class="main-split">
+            <!-- 左侧品类面板 -->
+            <scroll-view class="left-panel" scroll-y enhanced="{{true}}" show-scrollbar="{{false}}">
+                <view class="section-title">
+                    <text>废品品类</text>
+                    <view class="manage-btn" bindtap="openManageCatModal">⚙️</view>
+                </view>
+                <view id="category-grid" class="category-grid">
+                    <view class="cat-btn {{item.id === selectedCatId ? 'selected' : ''}}" 
+                          wx:for="{{categories}}" wx:key="id" 
+                          bindtap="selectCategory" data-id="{{item.id}}">
+                        <view class="edit-price-icon" catchtap="openEditPriceModal" data-id="{{item.id}}">✏️</view>
+                        <view class="cat-name">{{item.name}}</view>
+                        <view class="cat-price">{{unit === 'kg' ? item.displayPriceKg : item.displayPriceJin}} 元/{{unit === 'jin' ? '斤' : '公斤'}}</view>
+                    </view>
+                </view>
+            </scroll-view>
+
+            <!-- 右侧交易清单面板 -->
+            <scroll-view class="right-panel" scroll-y enhanced="{{true}}" show-scrollbar="{{false}}">
+                <!-- 临时清单区 -->
+                <view id="invoice-card" class="invoice-card" wx:if="{{currentInvoice.length > 0}}">
+                    <view class="section-title" style="margin-top:0;">当前清单</view>
+                    <scroll-view class="invoice-list" scroll-y="true">
+                        <view class="invoice-item" wx:for="{{currentInvoice}}" wx:key="id">
+                            <view class="item-info">
+                                <view class="item-name">{{item.catName}} <text style="font-size:0.8rem;color:#E74C3C;">(￥{{item.unitPriceDisplay}})</text></view>
+                                <view class="item-detail">{{item.weight}}{{item.unit}} = {{item.totalDisplay}}元</view>
+                            </view>
+                            <view class="item-right">
+                                <view class="item-total">￥{{item.totalDisplay}}</view>
+                                <view class="btn-del-item" bindtap="removeInvoiceItem" data-id="{{item.id}}">🗑</view>
+                            </view>
+                        </view>
+                    </scroll-view>
+                    <view class="invoice-summary">
+                        <view class="sum-label">合计金额：</view>
+                        <view class="sum-value">￥{{invoiceSumDisplay}}</view>
+                    </view>
+                    <view class="btn-settle" hover-class="btn-settle-active" bindtap="settleInvoice">确认结算</view>
+                </view>
+                <!-- 空清单状态 -->
+                <view class="empty-invoice-state" wx:else>
+                    <view style="font-size: 2rem; margin-bottom: 10px;">🧾</view>
+                    <view>暂无交易清单</view>
+                    <view style="font-size: 0.85rem; opacity: 0.7; margin-top: 5px;">请点击左侧品类开始记账</view>
+                </view>
+            </scroll-view>
+        </view>
+
+        <!-- 键盘与输入区 (底部弹窗) -->
+        <view class="modal-overlay bottom-sheet-overlay {{calculatorActive ? 'active' : ''}}" wx:if="{{calculatorActive}}" bindtap="closeCalculator" catchtouchmove="stopBubble">
+            <view class="input-card" catchtap="stopBubble" bindtouchstart="onTouchStart" catchtouchmove="onTouchMove" bindtouchend="onTouchEnd" style="transform: translateY({{translateY}}px); transition: {{transitionStyle}};">
+                <view class="drag-handle"></view>
+                <!-- 临时浮动单价 -->
+                <view class="temp-price-bar">
+                <view class="temp-price-left">
+                    <text class="temp-price-label">{{selectedCatName || '请选择品类'}}</text>
+                </view>
+                <view class="temp-price-controls">
+                    <view class="btn-price-adj" bindtap="adjustTempPrice" data-delta="-0.05">-0.05</view>
+                    <view class="temp-price-val" bindtap="openTempPriceModal">￥{{tempPriceDisplay}}</view>
+                    <view class="btn-price-adj" bindtap="adjustTempPrice" data-delta="0.05">+0.05</view>
+                </view>
+            </view>
+
+            <view class="input-display">
+                <view class="clear-history">
+                    <view class="restore-btn" wx:for="{{lastClearedFormulas}}" wx:key="index" bindtap="restoreFormula" data-index="{{index}}">
+                        撤销 {{item}}
+                    </view>
+                </view>
+                <view class="input-right">
+                    <view class="formula-text">{{inputFormulaDisplay}}</view>
+                    <view class="result-text">{{inputResultDisplay}} <text style="font-size: 1rem; color: #7F8C8D;">{{unit === 'jin' ? '斤' : '公斤'}}</text></view>
+                </view>
+            </view>
+            <view class="keyboard">
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key="1">1</view>
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key="2">2</view>
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key="3">3</view>
+                <view class="key-btn key-action" hover-class="key-btn-active" bindtap="inputKey" data-key="back">退格</view>
+
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key="4">4</view>
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key="5">5</view>
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key="6">6</view>
+                <view class="key-btn key-action" hover-class="key-btn-active" bindtap="inputKey" data-key="C">清空</view>
+
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key="7">7</view>
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key="8">8</view>
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key="9">9</view>
+                <view class="key-btn key-action" hover-class="key-btn-active" bindtap="inputKey" data-key="+">+</view>
+
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key="0">0</view>
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key="00">00</view>
+                <view class="key-btn" hover-class="key-btn-active" bindtap="inputKey" data-key=".">.</view>
+                <view class="key-btn key-action" hover-class="key-btn-active" bindtap="inputKey" data-key="-">-</view>
+
+                <view class="key-btn key-enter" hover-class="key-enter-active" bindtap="addToInvoice">加入清单</view>
+            </view>
+            </view>
+        </view>
+    </block>
+
+    <!-- 历史账本区 -->
+    <view class="page-content {{activePage === 'history' ? 'active' : ''}}" wx:if="{{activePage === 'history' && !isCloudSyncing}}">
+        <view class="history-stats-card">
+            <view class="stats">
+                <view class="stat-item">
+                    <view class="stat-label">今日结账总额 (元)</view>
+                    <view class="stat-value">{{todayTotalMoneyDisplay}}</view>
+                </view>
+                <view class="stat-item" style="align-items: flex-end;">
+                    <view class="stat-label">今日单数</view>
+                    <view class="stat-value" style="font-size: 1.5rem;">{{todayTotalCount}}<text style="font-size: 1.2rem;font-weight:normal;"> 单</text></view>
+                </view>
+            </view>
+        </view>
+
+        <view class="section-title" style="margin-top: 5px;">历史记账记录</view>
+        <view class="history-list">
+            <block wx:if="{{history.length > 0}}">
+                <view class="history-card" wx:for="{{history}}" wx:key="id">
+                    <view class="history-header">
+                        <text class="history-time">{{item.timeStr}}</text>
+                        <text class="history-total">￥{{item.totalDisplay}}</text>
+                    </view>
+                    <view class="history-items">{{item.itemsText}}</view>
+                    <view class="history-actions">
+                        <view class="btn-history-action btn-history-receipt" bindtap="openReceiptFromHistory" data-item="{{item}}">🧾 电子小票</view>
+                        <view class="btn-history-action btn-history-copy" bindtap="copyText" data-text="{{item.copyTextStr}}">复制发微信</view>
+                        <view class="btn-history-action btn-history-undo" bindtap="undoHistory" data-id="{{item.id}}">撤回删除</view>
+                    </view>
+                </view>
+            </block>
+            <view wx:else style="text-align: center; color: var(--text-muted); padding: 40px 0;">
+                暂无交易记录
+            </view>
+        </view>
+    </view>
+
+<!-- 底部导航 -->
+<view class="bottom-nav">
+    <view class="nav-item {{activePage === 'book' ? 'active' : ''}}" bindtap="switchPage" data-page="book">
+        <text class="nav-icon">📝</text>
+        记账收钱
+    </view>
+    <view id="nav-history" class="nav-item {{activePage === 'history' ? 'active' : ''}}" bindtap="switchPage" data-page="history">
+        <text class="nav-icon">📒</text>
+        历史账本
+    </view>
+</view>
+
+<!-- 弹窗：修改全局统一定价 -->
+<view class="modal-overlay {{modalEditPriceActive ? 'active' : ''}}" wx:if="{{modalEditPriceActive}}">
+    <view class="modal-card">
+        <view class="modal-title">修改 <text style="color:var(--primary-color);">{{editCatName}}</text> 单价</view>
+        <view style="text-align: center; margin-bottom: 10px; color: var(--text-muted);">
+            当前单位：元 / {{unit === 'jin' ? '斤' : '公斤'}}
+        </view>
+        <input type="digit" class="modal-input" value="{{inputEditPrice}}" bindinput="onInputEditPrice" placeholder="输入新单价" focus="{{modalEditPriceActive}}"/>
+        <view class="modal-actions">
+            <view class="modal-btn modal-btn-cancel" bindtap="closeModal" data-id="modalEditPriceActive">取消</view>
+            <view class="modal-btn modal-btn-danger" bindtap="deleteCategory">删除</view>
+            <view class="modal-btn modal-btn-confirm" bindtap="confirmEditPrice">确定保存</view>
+        </view>
+    </view>
+</view>
+
+<!-- 弹窗：仅修改本次临时单价 -->
+<view class="modal-overlay {{modalTempPriceActive ? 'active' : ''}}" wx:if="{{modalTempPriceActive}}">
+    <view class="modal-card">
+        <view class="modal-title">手动输入临时单价</view>
+        <input type="digit" class="modal-input" value="{{inputTempPrice}}" bindinput="onInputTempPrice" focus="{{modalTempPriceActive}}"/>
+        <view class="modal-actions">
+            <view class="modal-btn modal-btn-cancel" bindtap="closeModal" data-id="modalTempPriceActive">取消</view>
+            <view class="modal-btn modal-btn-confirm" bindtap="confirmTempPrice">确定</view>
+        </view>
+    </view>
+</view>
+
+    <view class="modal-overlay {{settingsModalActive ? 'active' : ''}}" wx:if="{{settingsModalActive}}">
+        <view class="modal-card">
+            <view class="modal-title">设置</view>
+            
+            <view class="settings-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                <view class="settings-label">小票店名/回收站名称</view>
+                <input class="settings-input-field" value="{{storeName}}" placeholder="如：绿色废品回收站" bindinput="onInputStoreName" />
+            </view>
+
+            <view class="settings-row" style="flex-direction: column; align-items: flex-start; gap: 6px;">
+                <view class="settings-label">小票联系电话 (选填)</view>
+                <input type="text" class="settings-input-field" value="{{storePhone}}" placeholder="输入手机号或电话（印在小票上）" bindinput="onInputStorePhone" />
+            </view>
+
+            <view class="settings-row">
+                <view class="settings-label">计价单位</view>
+                <view class="unit-toggle-new">
+                    <view class="unit-btn {{unit === 'jin' ? 'active' : ''}}" bindtap="switchUnit" data-unit="jin">斤</view>
+                    <view class="unit-btn {{unit === 'kg' ? 'active' : ''}}" bindtap="switchUnit" data-unit="kg">公斤</view>
+                </view>
+            </view>
+
+            <view class="settings-row">
+                <view class="settings-label">字体大小</view>
+                <view class="settings-controls">
+                    <view class="modal-btn modal-btn-cancel" style="padding: 8px 16px; flex: initial;" bindtap="adjustFontScale" data-delta="-0.1">A-</view>
+                    <view id="font-scale-display" style="font-weight: bold; width: 40px; text-align: center;">{{fontScaleDisplay}}</view>
+                    <view class="modal-btn modal-btn-cancel" style="padding: 8px 16px; flex: initial;" bindtap="adjustFontScale" data-delta="0.1">A+</view>
+                </view>
+            </view>
+
+            <view class="settings-row">
+                <view class="settings-label">语音播报</view>
+                <view class="unit-toggle-new">
+                    <view class="unit-btn {{voiceEnabled ? 'active' : ''}}" bindtap="switchVoice" data-enabled="1">开启</view>
+                    <view class="unit-btn {{!voiceEnabled ? 'active' : ''}}" bindtap="switchVoice" data-enabled="0">关闭</view>
+                </view>
+            </view>
+
+            <view class="settings-row">
+                <view class="settings-label">操作教学</view>
+                <view class="settings-controls">
+                    <view class="modal-btn modal-btn-confirm" style="padding: 8px 16px; flex: initial; font-size: 0.95rem; background: var(--primary-color);" bindtap="restartTutorial">重新观看</view>
+                </view>
+            </view>
+
+            <view class="modal-actions" style="margin-top: 20px;">
+                <view class="modal-btn modal-btn-confirm" bindtap="closeSettingsModal">完成</view>
+            </view>
+        </view>
+    </view>
+
+    <!-- 弹窗：管理品类 -->
+<view class="modal-overlay {{modalManageCatActive ? 'active' : ''}}" wx:if="{{modalManageCatActive}}">
+    <view class="modal-card">
+        <view class="modal-title">新增品类</view>
+        <input type="text" class="modal-input" value="{{inputNewCatName}}" bindinput="onInputNewCatName" placeholder="输入废品名称 (例: 报纸)"/>
+        <input type="digit" class="modal-input" value="{{inputNewCatPrice}}" bindinput="onInputNewCatPrice" placeholder="输入单价 (元)"/>
+        <view class="modal-actions">
+            <view class="modal-btn modal-btn-cancel" bindtap="closeModal" data-id="modalManageCatActive">关闭</view>
+            <view class="modal-btn modal-btn-confirm" bindtap="confirmAddCategory">添加</view>
+        </view>
+        <view style="margin-top: 20px; text-align: center; font-size: 0.9rem; color: var(--text-muted);">
+            提示：如需修改或删除品类，请点击主界面品类卡片右上角的“✏️”图标。
+        </view>
+    </view>
+</view>
+
+<!-- 新手引导遮罩与气泡 -->
+<view class="guide-overlay {{tutorialActive ? 'active' : ''}}" wx:if="{{tutorialActive}}" catchtouchmove="stopBubble">
+    <!-- rect 未算出时：全屏兜底遮罩，保证引导一开始就有遮罩 -->
+    <view class="guide-mask-full" wx:if="{{!highlightStyle}}"></view>
+    <!-- rect 算出后：4 块拼接挖洞，中间镂空高亮区 -->
+    <block wx:else>
+        <view class="guide-mask-panel" style="{{maskTopStyle}}"></view>
+        <view class="guide-mask-panel" style="{{maskBottomStyle}}"></view>
+        <view class="guide-mask-panel" style="{{maskLeftStyle}}"></view>
+        <view class="guide-mask-panel" style="{{maskRightStyle}}"></view>
+    </block>
+    <!-- 高亮虚线边框 -->
+    <view class="guide-highlight" style="{{highlightStyle}}"></view>
+    <view class="guide-tooltip {{tooltipAlign}}" style="{{tooltipStyle}}" catchtap="stopBubble">
+        <view class="guide-tooltip-title">
+            <view style="display: flex; align-items: center; gap: 6px;">
+                <text class="guide-tooltip-icon">💡</text>
+                <text>{{tutorialTitle}}</text>
+            </view>
+            <view class="guide-voice-btn" bindtap="toggleTutorialVoice">
+                <text>{{tutorialVoiceMuted ? '🔇' : '🔊'}}</text>
+            </view>
+        </view>
+        <view class="guide-tooltip-content">
+            <rich-text nodes="{{tutorialContent}}"></rich-text>
+        </view>
+        <view class="guide-tooltip-actions">
+            <text class="guide-step-indicator">{{tutorialStepIndex + 1}} / {{tutorialStepsCount}}</text>
+            <view style="display: flex; gap: 8px;">
+                <view class="guide-btn guide-btn-text" bindtap="skipTutorial">跳过</view>
+                <view class="guide-btn guide-btn-text" wx:if="{{tutorialStepIndex > 0}}" bindtap="prevTutorialStep">上一步</view>
+                <view class="guide-btn guide-btn-primary" bindtap="nextTutorialStep">{{tutorialStepIndex === tutorialStepsCount - 1 ? '完成' : '下一步'}}</view>
+            </view>
+        </view>
+    </view>
+</view>
+
+<!-- 弹窗：电子小票预览与保存/分享 -->
+<view class="modal-overlay receipt-modal-overlay {{receiptModalActive ? 'active' : ''}}" wx:if="{{receiptModalActive}}" bindtap="closeReceiptModal" catchtouchmove="stopBubble">
+    <view class="receipt-modal-card" catchtap="stopBubble">
+        <view class="receipt-modal-header">
+            <view class="receipt-title-box">
+                <text class="receipt-title-icon">🧾</text>
+                <text class="receipt-title-text">电子回收结算小票</text>
+            </view>
+            <view class="receipt-modal-close" bindtap="closeReceiptModal">✕</view>
+        </view>
+        
+        <view class="receipt-sub-tip">💡 微信长按小票图片可直接发送给好友或保存</view>
+
+        <scroll-view class="receipt-scroll-container" scroll-y="true">
+            <view class="receipt-paper-wrapper">
+                <image class="receipt-preview-img" src="{{receiptImgUrl}}" mode="widthFix" show-menu-by-longpress="{{true}}" bindtap="previewReceiptImage"></image>
+            </view>
+        </scroll-view>
+
+        <view class="receipt-modal-footer">
+            <button class="receipt-btn receipt-btn-preview" bindtap="previewReceiptImage">🔍 放大查看</button>
+            <button class="receipt-btn receipt-btn-save" bindtap="saveReceiptToPhotos">📥 保存相册</button>
+            <button class="receipt-btn receipt-btn-share" open-type="share">📤 转发分享</button>
+        </view>
+    </view>
+</view>
+
+<!-- 离屏 Canvas (新版 Canvas 2D) 用于动态绘制超清小票 -->
+<canvas type="2d" id="receiptCanvas" class="receipt-offscreen-canvas" style="width: {{receiptCanvasWidth}}px; height: {{receiptCanvasHeight}}px;"></canvas>
+
+</view>

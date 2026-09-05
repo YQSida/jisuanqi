@@ -1,0 +1,15 @@
+{
+  "pages": [
+    "pages/index/index"
+  ],
+  "window": {
+    "backgroundColor": "#F5F7FA",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#0F5A3E",
+    "navigationBarTitleText": "摊友称重计价助手",
+    "navigationBarTextStyle": "white"
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}
