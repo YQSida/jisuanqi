@@ -96,7 +96,7 @@
                         <view class="sum-value">￥{{invoiceSumDisplay}}</view>
                     </view>
                     <view class="btn-settle" hover-class="btn-settle-active" bindtap="settleInvoice">
-                        确认结算 (￥{{invoiceSumDisplay}})
+                        确认结算
                     </view>
                 </view>
                 <!-- 空清单状态 -->

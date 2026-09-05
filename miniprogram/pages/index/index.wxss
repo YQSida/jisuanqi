@@ -3,6 +3,10 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 /* === 头部 === */
@@ -101,14 +105,17 @@
     top: env(safe-area-inset-top, 0px);
     background-color: var(--bg-color);
     z-index: 90;
-    padding: calc(env(safe-area-inset-top, 0px) + 10px) 15px 10px 15px;
+    padding: calc(env(safe-area-inset-top, 0px) + 8px) 10px 8px 10px;
     margin-top: -10px;
     box-sizing: border-box;
+    width: 100%;
 }
 .customer-tabs {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     flex: 1;
+    min-width: 0;
+    width: 0;
     overflow-x: auto;
 }
 .customer-tabs::-webkit-scrollbar {
@@ -119,21 +126,22 @@
 }
 .nav-right-actions {
     display: flex;
-    gap: 8px;
-    margin-left: 12px;
+    gap: 6px;
+    margin-left: 8px;
+    flex-shrink: 0;
 }
 .tab-item {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 60px;
-    height: 42px;
-    padding: 0 16px;
+    min-width: 52px;
+    height: 36px;
+    padding: 0 12px;
     background: #F1F5F9;
     color: #64748B;
-    border-radius: 21px;
+    border-radius: 18px;
     font-weight: 600;
-    font-size: calc(1.0rem * var(--font-scale));
+    font-size: calc(0.9rem * var(--font-scale));
     position: relative;
     transition: all 0.2s;
     flex-shrink: 0;
@@ -141,7 +149,7 @@
 .tab-item.active {
     background: var(--primary-color);
     color: white;
-    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.25);
+    box-shadow: 0 3px 8px rgba(22, 163, 74, 0.25);
     transform: translateY(-1px);
 }
 .has-items-dot {
@@ -149,22 +157,22 @@
     top: 0px;
     right: 2px;
     background: #EF4444;
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    border: 2px solid white;
+    border: 1.5px solid white;
 }
 .tab-add-btn, .action-btn {
     display: inline-flex;
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
     background: #F1F5F9;
     color: #64748B;
     align-items: center;
     justify-content: center;
-    border-radius: 21px;
+    border-radius: 18px;
     font-weight: bold;
-    font-size: calc(1.3rem * var(--font-scale));
+    font-size: calc(1.15rem * var(--font-scale));
     flex-shrink: 0;
     transition: all 0.2s;
 }
@@ -175,13 +183,13 @@
 button.share-btn {
     margin: 0 !important;
     padding: 0 !important;
-    width: 42px !important;
-    min-width: 42px !important;
-    height: 42px !important;
-    min-height: 42px !important;
-    line-height: 42px !important;
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    line-height: 36px !important;
     background-color: #F1F5F9 !important;
-    border-radius: 21px !important;
+    border-radius: 18px !important;
 }
 button.share-btn::after {
     border: none;
@@ -194,16 +202,23 @@ button.share-btn::after {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    gap: 12px;
+    gap: 8px;
+    padding: 0 10px;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
     height: calc(100vh - 120px - env(safe-area-inset-bottom));
 }
 .left-panel {
-    width: 35%;
+    width: 102px;
     flex-shrink: 0;
+    min-width: 0;
     height: 100%;
 }
 .right-panel {
     flex: 1;
+    min-width: 0;
+    width: 0;
     height: 100%;
 }
 .empty-invoice-state {
@@ -450,19 +465,21 @@ button.share-btn::after {
 .invoice-card {
     background: var(--card-bg);
     border-radius: var(--radius-lg);
-    padding: 20px;
+    padding: 12px 10px;
     box-shadow: var(--shadow-sm);
     margin-bottom: 20px;
+    box-sizing: border-box;
+    width: 100%;
 }
 .invoice-list {
-    margin-bottom: 15px;
-    max-height: 250px;
+    margin-bottom: 10px;
+    max-height: 220px;
 }
 .invoice-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
+    padding: 8px 0;
     border-bottom: 1px dashed var(--border-color);
 }
 .invoice-item:last-child {
@@ -471,51 +488,59 @@ button.share-btn::after {
 .item-info {
     display: flex;
     flex-direction: column;
+    flex: 1;
+    min-width: 0;
 }
 .item-name {
-    font-size: calc(1.1rem * var(--font-scale));
+    font-size: calc(0.95rem * var(--font-scale));
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .item-detail {
-    font-size: calc(0.9rem * var(--font-scale));
+    font-size: calc(0.8rem * var(--font-scale));
     color: var(--text-muted);
-    margin-top: 4px;
+    margin-top: 2px;
 }
 .item-right {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 6px;
+    flex-shrink: 0;
+    margin-left: 4px;
 }
 .item-total {
-    font-size: calc(1.2rem * var(--font-scale));
+    font-size: calc(1.05rem * var(--font-scale));
     font-weight: bold;
     color: var(--text-main);
 }
 .btn-del-item {
     background: var(--danger-light);
     color: var(--danger-color);
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    font-size: calc(1.2rem * var(--font-scale));
+    font-size: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 .invoice-summary {
-    border-top: 2px solid var(--border-color);
-    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 .sum-label {
-    font-size: calc(1.2rem * var(--font-scale));
+    font-size: calc(0.95rem * var(--font-scale));
     font-weight: bold;
 }
 .sum-value {
-    font-size: calc(1.8rem * var(--font-scale));
+    font-size: calc(1.35rem * var(--font-scale));
     font-weight: bold;
     color: var(--accent-color);
 }
@@ -523,12 +548,16 @@ button.share-btn::after {
     background: var(--accent-color);
     color: white;
     width: 100%;
-    padding: 18px;
-    border-radius: 50px;
-    font-size: calc(1.3rem * var(--font-scale));
+    padding: 12px 6px;
+    border-radius: 24px;
+    font-size: calc(1.05rem * var(--font-scale));
     font-weight: bold;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+    box-shadow: 0 3px 10px rgba(46, 204, 113, 0.3);
+    box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .btn-settle-active {
     transform: scale(0.98);
@@ -1271,30 +1300,42 @@ button.share-btn::after {
 .discount-bar {
     display: flex;
     align-items: center;
-    padding: 8px 10px;
+    padding: 6px 6px;
     background: #F8FAFC;
     border-radius: 8px;
-    margin: 8px 0;
+    margin: 6px 0;
     gap: 4px;
+    width: 100%;
+    box-sizing: border-box;
     overflow-x: auto;
 }
 .discount-title {
-    font-size: calc(0.8rem * var(--font-scale));
+    font-size: calc(0.75rem * var(--font-scale));
     color: var(--text-muted);
     white-space: nowrap;
+    flex-shrink: 0;
 }
 .discount-chips {
     display: flex;
-    gap: 5px;
+    gap: 4px;
     flex-wrap: nowrap;
+    overflow-x: auto;
+    flex: 1;
+    min-width: 0;
+}
+.discount-chips::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
 }
 .discount-chip {
-    font-size: calc(0.78rem * var(--font-scale));
-    padding: 3px 8px;
-    border-radius: 12px;
+    font-size: calc(0.72rem * var(--font-scale));
+    padding: 2px 6px;
+    border-radius: 6px;
     background: #EDF2F7;
     color: #4A5568;
     white-space: nowrap;
+    flex-shrink: 0;
     transition: all 0.2s;
 }
 .discount-chip.active {
