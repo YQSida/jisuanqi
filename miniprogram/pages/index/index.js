@@ -109,16 +109,40 @@ Page({
 
         inputFormulaDisplay: '',
         inputResultDisplay: '0',
+        inputGrossWeightDisplay: '0',
+        inputNetWeightDisplay: '0',
         lastClearedFormulas: [],
         calculatorActive: false,
         translateY: 0,
         transitionStyle: '',
+
+        // 智能去皮 (Tare)
+        tareWeight: 0,
+        tareWeightDisplay: '0.0',
+        tarePresets: [0, 1, 2, 3, 5],
+        customTareModalActive: false,
+        inputCustomTare: '',
+
+        // 抹零与整单让利 (Discount / Rounding)
+        discountMode: 'none', // 'none' | 'fen' | 'jiao' | 'round' | 'custom'
+        customDiscountModalActive: false,
+        inputCustomFinalAmount: '',
+        invoiceOriginalSumDisplay: '0.00',
+        discountAmount: 0,
+        discountAmountDisplay: '0.00',
+        invoiceFinalSumDisplay: '0.00',
 
         currentInvoice: [],
         invoiceSumDisplay: '0.00',
 
         todayTotalMoneyDisplay: '0.00',
         todayTotalCount: 0,
+        todayCategorySummary: [],
+        summaryExpanded: true,
+
+        // 老板收款码快捷出示
+        payQrModalActive: false,
+        payQrUrl: '',
 
         // 电子小票配置与状态
         storeName: '绿色废品回收站',
@@ -199,6 +223,7 @@ Page({
         if (voiceEnabled === '') voiceEnabled = true;
         const storeName = wx.getStorageSync('app_storeName') || '绿色废品回收站';
         const storePhone = wx.getStorageSync('app_storePhone') || '';
+        const payQrUrl = wx.getStorageSync('app_pay_qr') || '';
         const categories = wx.getStorageSync('app_categories') || DEFAULT_CATEGORIES;
         const customerCounter = parseInt(wx.getStorageSync('app_cust_counter')) || 3;
         const customers = wx.getStorageSync('app_customers') || DEFAULT_CUSTOMERS;
@@ -209,7 +234,7 @@ Page({
 
         this.setData({
             unit, fontScale, fontScaleDisplay: fontScale.toFixed(1), voiceEnabled,
-            storeName, storePhone,
+            storeName, storePhone, payQrUrl,
             categories, customerCounter, customers, history, activeCustomerId, selectedCatId
         }, () => {
             if (selectedCatId) {
@@ -708,6 +733,54 @@ Page({
         });
     },
 
+    setTareWeight(e) {
+        const val = parseFloat(e.currentTarget.dataset.weight);
+        this.setData({
+            tareWeight: val,
+            tareWeightDisplay: val.toFixed(1)
+        }, () => {
+            this.updateInputDisplay();
+            wx.vibrateShort({ type: 'light' });
+        });
+    },
+
+    openCustomTareModal() {
+        this.setData({
+            customTareModalActive: true,
+            inputCustomTare: this.data.tareWeight > 0 ? this.data.tareWeight.toString() : ''
+        });
+    },
+
+    onInputCustomTare(e) {
+        this.setData({ inputCustomTare: e.detail.value });
+    },
+
+    confirmCustomTare() {
+        const val = parseFloat(this.data.inputCustomTare);
+        if (!isNaN(val) && val >= 0) {
+            this.setData({
+                tareWeight: val,
+                tareWeightDisplay: val.toFixed(1),
+                customTareModalActive: false
+            }, () => {
+                this.updateInputDisplay();
+            });
+        } else {
+            wx.showToast({ title: '请输入有效皮重', icon: 'none' });
+        }
+    },
+
+    getCalculatedGrossWeight() {
+        return this.getCalculatedWeight();
+    },
+
+    getCalculatedNetWeight() {
+        const gross = this.getCalculatedGrossWeight();
+        const tare = this.data.tareWeight || 0;
+        const net = Math.max(0, gross - tare);
+        return Math.round(net * 100) / 100;
+    },
+
     getCalculatedWeight() {
         const curr = this.getCurrentCustomer();
         const catId = this.data.selectedCatId;
@@ -771,31 +844,46 @@ Page({
             curr.hasFormulas = hasFormulas;
         }
 
-        const res = this.getCalculatedWeight();
-        let displayRes = res.toString();
-        if (displayRes.indexOf('.') !== -1) {
-            displayRes = parseFloat(res.toPrecision(12)).toString();
+        const gross = this.getCalculatedGrossWeight();
+        const tare = this.data.tareWeight || 0;
+        const net = Math.max(0, gross - tare);
+
+        let displayGross = gross.toString();
+        if (displayGross.indexOf('.') !== -1) {
+            displayGross = parseFloat(gross.toPrecision(12)).toString();
         }
+
+        let displayNet = (Math.round(net * 100) / 100).toString();
 
         this.setData({
             inputFormulaDisplay: formula,
             lastClearedFormulas: lastClearedArr,
-            inputResultDisplay: formula ? displayRes : '0',
+            inputGrossWeightDisplay: formula ? displayGross : '0',
+            inputNetWeightDisplay: formula ? displayNet : '0',
+            inputResultDisplay: formula ? (tare > 0 ? displayNet : displayGross) : '0',
             customers: this.data.customers
         });
     },
 
     addToInvoice() {
-        const weight = this.getCalculatedWeight();
-        if (weight <= 0) {
+        const gross = this.getCalculatedGrossWeight();
+        const tare = this.data.tareWeight || 0;
+        const netWeight = Math.max(0, Math.round((gross - tare) * 100) / 100);
+
+        if (gross <= 0) {
             wx.showToast({ title: '请输入有效重量', icon: 'none' });
             return;
         }
+        if (netWeight <= 0) {
+            wx.showToast({ title: '扣除皮重后净重必须大于0', icon: 'none' });
+            return;
+        }
+
         const cat = this.data.categories.find(c => c.id === this.data.selectedCatId);
         if (!cat) return;
 
         const unitPrice = this.data.tempPrice;
-        const total = parseFloat((weight * unitPrice).toFixed(2));
+        const total = parseFloat((netWeight * unitPrice).toFixed(2));
 
         let customers = this.data.customers;
         const customerIdx = customers.findIndex(c => c.id === this.data.activeCustomerId);
@@ -804,7 +892,9 @@ Page({
         curr.invoice.push({
             id: Date.now(),
             catName: cat.name,
-            weight: weight,
+            weight: netWeight,
+            grossWeight: gross,
+            tareWeight: tare,
             unit: this.data.unit === 'jin' ? '斤' : '公斤',
             unitPrice: unitPrice,
             unitPriceDisplay: unitPrice.toFixed(2),
@@ -850,12 +940,72 @@ Page({
         const curr = this.getCurrentCustomer();
         if (!curr) return;
         
-        let sum = curr.invoice.reduce((acc, item) => acc + item.total, 0);
+        let rawSum = curr.invoice.reduce((acc, item) => acc + item.total, 0);
+        rawSum = Math.round(rawSum * 100) / 100;
+
+        let mode = this.data.discountMode;
+        let finalAmount = rawSum;
+
+        if (mode === 'fen') {
+            // 抹分 (保留一位小数，抹掉最后的分)
+            finalAmount = Math.floor(rawSum * 10) / 10;
+        } else if (mode === 'jiao') {
+            // 抹角 (直接抹零到元)
+            finalAmount = Math.floor(rawSum);
+        } else if (mode === 'round') {
+            // 四舍五入到元
+            finalAmount = Math.round(rawSum);
+        } else if (mode === 'custom') {
+            finalAmount = parseFloat(this.data.inputCustomFinalAmount);
+            if (isNaN(finalAmount) || finalAmount < 0) finalAmount = rawSum;
+        } else {
+            finalAmount = rawSum;
+        }
+
+        finalAmount = Math.round(finalAmount * 100) / 100;
+        const discount = Math.round((rawSum - finalAmount) * 100) / 100;
 
         this.setData({
             currentInvoice: curr.invoice,
-            invoiceSumDisplay: sum.toFixed(2)
+            invoiceOriginalSumDisplay: rawSum.toFixed(2),
+            invoiceSumDisplay: finalAmount.toFixed(2),
+            invoiceFinalSumDisplay: finalAmount.toFixed(2),
+            discountAmount: discount,
+            discountAmountDisplay: Math.abs(discount).toFixed(2)
         });
+    },
+
+    setDiscountMode(e) {
+        const mode = e.currentTarget.dataset.mode;
+        if (mode === 'custom') {
+            this.setData({
+                customDiscountModalActive: true,
+                inputCustomFinalAmount: this.data.invoiceSumDisplay
+            });
+            return;
+        }
+        this.setData({ discountMode: mode }, () => {
+            this.renderInvoice();
+            wx.vibrateShort({ type: 'light' });
+        });
+    },
+
+    onInputCustomDiscount(e) {
+        this.setData({ inputCustomFinalAmount: e.detail.value });
+    },
+
+    confirmCustomDiscount() {
+        const val = parseFloat(this.data.inputCustomFinalAmount);
+        if (!isNaN(val) && val >= 0) {
+            this.setData({
+                discountMode: 'custom',
+                customDiscountModalActive: false
+            }, () => {
+                this.renderInvoice();
+            });
+        } else {
+            wx.showToast({ title: '请输入有效金额', icon: 'none' });
+        }
     },
 
     settleInvoice() {
@@ -865,12 +1015,16 @@ Page({
 
         if (curr.invoice.length === 0) return;
 
-        let sum = curr.invoice.reduce((acc, item) => acc + item.total, 0);
+        const rawSum = parseFloat(this.data.invoiceOriginalSumDisplay) || 0;
+        const finalSum = parseFloat(this.data.invoiceFinalSumDisplay) || rawSum;
+        const discount = parseFloat(this.data.discountAmount) || 0;
 
         const record = {
             id: Date.now(),
             time: new Date().getTime(),
-            total: sum,
+            originalTotal: rawSum,
+            discount: discount,
+            total: finalSum,
             items: [...curr.invoice]
         };
 
@@ -905,6 +1059,7 @@ Page({
             history,
             customers,
             customerCounter,
+            discountMode: 'none',
             activeCustomerId: customers[0].id
         }, () => {
             this.saveHistory();
@@ -913,11 +1068,11 @@ Page({
             this.renderInvoice();
             this.updateStats();
 
-            this.playSettlementVoice(sum);
+            this.playSettlementVoice(finalSum);
             wx.vibrateShort();
             wx.showModal({
                 title: '结算成功',
-                content: `本次结算 ￥${sum.toFixed(2)}，是否生成并查看电子回收小票？`,
+                content: `本次实结 ￥${finalSum.toFixed(2)}${discount !== 0 ? ` (优惠￥${discount.toFixed(2)})` : ''}，是否生成并查看电子回收小票？`,
                 confirmText: '查看小票',
                 cancelText: '完成',
                 confirmColor: '#0F5A3E',
@@ -1086,17 +1241,147 @@ Page({
 
         let todayTotal = 0;
         let todayCount = 0;
+        const categoryMap = {};
 
         this.data.history.forEach(r => {
             if (r.time >= todayTime) {
                 todayTotal += r.total;
                 todayCount++;
+
+                (r.items || []).forEach(item => {
+                    const name = item.catName || '其他';
+                    if (!categoryMap[name]) {
+                        categoryMap[name] = {
+                            name: name,
+                            totalWeight: 0,
+                            totalMoney: 0,
+                            count: 0,
+                            unit: item.unit || '斤'
+                        };
+                    }
+                    categoryMap[name].totalWeight += (item.weight || 0);
+                    categoryMap[name].totalMoney += (item.total || 0);
+                    categoryMap[name].count++;
+                });
             }
         });
 
+        const todayCategorySummary = Object.values(categoryMap).map(c => {
+            const avgPrice = c.totalWeight > 0 ? (c.totalMoney / c.totalWeight).toFixed(2) : '0.00';
+            return {
+                ...c,
+                totalWeightDisplay: (Math.round(c.totalWeight * 10) / 10).toFixed(1),
+                totalMoneyDisplay: c.totalMoney.toFixed(2),
+                avgPrice: avgPrice
+            };
+        }).sort((a, b) => b.totalMoney - a.totalMoney);
+
         this.setData({
             todayTotalMoneyDisplay: todayTotal.toFixed(2),
-            todayTotalCount: todayCount
+            todayTotalCount: todayCount,
+            todayCategorySummary: todayCategorySummary
+        });
+    },
+
+    toggleSummaryExpanded() {
+        this.setData({ summaryExpanded: !this.data.summaryExpanded });
+    },
+
+    copyTodayReport() {
+        const { todayTotalMoneyDisplay, todayTotalCount, todayCategorySummary, storeName } = this.data;
+        if (todayTotalCount === 0) {
+            wx.showToast({ title: '今日暂无对账数据', icon: 'none' });
+            return;
+        }
+
+        const date = new Date();
+        const dateStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+
+        let lines = [];
+        lines.push(`📊【${storeName || '绿色废品回收站'}】今日收摊报表`);
+        lines.push(`📅 日期：${dateStr}`);
+        lines.push(`🧾 今日总单数：${todayTotalCount} 单`);
+        lines.push(`💰 实结总额：￥${todayTotalMoneyDisplay} 元`);
+        lines.push(`─────────────────`);
+        lines.push(`📦 各品类明细汇总：`);
+
+        todayCategorySummary.forEach(c => {
+            lines.push(`• ${c.name}：${c.totalWeightDisplay} ${c.unit} | ￥${c.totalMoneyDisplay} (均价${c.avgPrice})`);
+        });
+
+        lines.push(`─────────────────`);
+        lines.push(`* 由「摊友称重计价助手」自动生成`);
+
+        const reportText = lines.join('\n');
+        wx.setClipboardData({
+            data: reportText,
+            success: () => {
+                wx.showToast({ title: '今日战报已复制，快发微信群！', icon: 'none' });
+            }
+        });
+    },
+
+    reuseHistoryBill(e) {
+        const item = e.currentTarget.dataset.item;
+        if (!item || !item.items || item.items.length === 0) return;
+
+        let customers = this.data.customers;
+        const customerIdx = customers.findIndex(c => c.id === this.data.activeCustomerId);
+        if (customerIdx === -1) return;
+
+        let curr = customers[customerIdx];
+        const clonedItems = item.items.map(sub => ({
+            ...sub,
+            id: Date.now() + Math.random()
+        }));
+
+        curr.invoice = curr.invoice.concat(clonedItems);
+        customers[customerIdx] = curr;
+
+        this.setData({ customers }, () => {
+            this.saveCustomers();
+            this.renderInvoice();
+            wx.showToast({ title: '已将明细调入当前清单', icon: 'success' });
+            this.setData({ activePage: 'book' });
+        });
+    },
+
+    openPayQrModal() {
+        this.setData({ payQrModalActive: true });
+    },
+
+    closePayQrModal() {
+        this.setData({ payQrModalActive: false });
+    },
+
+    uploadPayQr() {
+        wx.chooseMedia({
+            count: 1,
+            mediaType: ['image'],
+            sourceType: ['album', 'camera'],
+            success: (res) => {
+                if (res.tempFiles && res.tempFiles.length > 0) {
+                    const tempPath = res.tempFiles[0].tempFilePath;
+                    wx.setStorageSync('app_pay_qr', tempPath);
+                    this.setData({ payQrUrl: tempPath });
+                    wx.showToast({ title: '收款码已保存', icon: 'success' });
+                }
+            }
+        });
+    },
+
+    removePayQr() {
+        wx.showModal({
+            title: '提示',
+            content: '确定要更换或删除当前收款码吗？',
+            confirmColor: '#E74C3C',
+            success: (res) => {
+                if (res.confirm) {
+                    wx.removeStorageSync('app_pay_qr');
+                    this.setData({ payQrUrl: '' });
+                    wx.showToast({ title: '已移除收款码', icon: 'none' });
+                }
+            }
         });
     },
 

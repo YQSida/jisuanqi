@@ -189,7 +189,8 @@ function calculateReceiptHeight(bill) {
     const baseHeight = 390; // 头尾基础固定高度
     const itemsCount = (bill.items && bill.items.length) || 1;
     const itemHeight = 34; // 每一条明细的高度
-    return baseHeight + (itemsCount * itemHeight);
+    const discountHeight = (bill.discount && bill.discount > 0) ? 28 : 0;
+    return baseHeight + (itemsCount * itemHeight) + discountHeight;
 }
 
 /**
@@ -299,7 +300,11 @@ function renderReceipt(canvas, options) {
         ctx.fillText(`${unitPrice}/${unit}`, 135, currY);
 
         ctx.fillStyle = '#2C3E50';
-        ctx.fillText(`${weight}${unit}`, 215, currY);
+        let weightStr = `${weight}${unit}`;
+        if (item.tareWeight && item.tareWeight > 0) {
+            weightStr = `${weight}${unit}(皮${item.tareWeight})`;
+        }
+        ctx.fillText(weightStr, 215, currY);
 
         ctx.textAlign = 'right';
         ctx.font = 'bold 13px sans-serif';
@@ -319,12 +324,25 @@ function renderReceipt(canvas, options) {
     ctx.font = '12px sans-serif';
     ctx.fillText(`品类件数：${items.length} 种`, paddingX, currY);
     ctx.fillText(`合计净重：${totalWeight.toFixed(1)} ${items[0] ? items[0].unit : '斤'}`, 140, currY);
-    currY += 24;
+    currY += 22;
+
+    // 若有抹零优惠折让
+    const hasDiscount = bill.discount && bill.discount > 0;
+    if (hasDiscount) {
+        const origMoney = parseFloat(bill.originalTotal || (bill.total + bill.discount)).toFixed(2);
+        const discMoney = parseFloat(bill.discount).toFixed(2);
+        ctx.fillStyle = '#7F8C8D';
+        ctx.font = '12px sans-serif';
+        ctx.fillText(`应计原价：￥${origMoney}`, paddingX, currY);
+        ctx.fillStyle = '#E74C3C';
+        ctx.fillText(`抹零让利：-￥${discMoney}`, 160, currY);
+        currY += 22;
+    }
 
     const totalMoney = parseFloat(bill.total || 0).toFixed(2);
     ctx.fillStyle = '#2C3E50';
     ctx.font = 'bold 14px sans-serif';
-    ctx.fillText('应付总额：', paddingX, currY);
+    ctx.fillText('实结总额：', paddingX, currY);
 
     ctx.fillStyle = '#0F5A3E';
     ctx.font = 'bold 24px sans-serif';

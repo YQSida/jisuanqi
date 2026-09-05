@@ -1249,3 +1249,284 @@ button.share-btn::after {
     pointer-events: none;
     opacity: 0;
 }
+
+/* === 顶部收款码快捷按钮 === */
+.pay-qr-nav-btn {
+    font-size: 1.15rem;
+    background: #E8F5E9;
+    border: 1px solid #C8E6C9;
+}
+
+/* === 清单皮重标签 === */
+.item-tare-tag {
+    font-size: 0.78rem;
+    color: #E67E22;
+    background: #FEF9E7;
+    padding: 1px 4px;
+    border-radius: 4px;
+    margin: 0 3px;
+}
+
+/* === 抹零折让快捷条 === */
+.discount-bar {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    background: #F8FAFC;
+    border-radius: 8px;
+    margin: 8px 0;
+    gap: 4px;
+    overflow-x: auto;
+}
+.discount-title {
+    font-size: calc(0.8rem * var(--font-scale));
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+.discount-chips {
+    display: flex;
+    gap: 5px;
+    flex-wrap: nowrap;
+}
+.discount-chip {
+    font-size: calc(0.78rem * var(--font-scale));
+    padding: 3px 8px;
+    border-radius: 12px;
+    background: #EDF2F7;
+    color: #4A5568;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+.discount-chip.active {
+    background: var(--primary-color);
+    color: #FFFFFF;
+    font-weight: bold;
+}
+.sum-left {
+    display: flex;
+    flex-direction: column;
+}
+.sum-discount-tag {
+    font-size: 0.75rem;
+    color: #E74C3C;
+    margin-top: 2px;
+}
+
+/* === 智能去皮 (Tare) 快捷栏 === */
+.tare-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: #FFFDF0;
+    border: 1px dashed #F39C12;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+.tare-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: calc(0.82rem * var(--font-scale));
+    color: #D35400;
+    font-weight: 600;
+}
+.tare-val-tag {
+    background: #E74C3C;
+    color: #FFFFFF;
+    font-size: 0.72rem;
+    padding: 1px 5px;
+    border-radius: 10px;
+}
+.tare-chips {
+    display: flex;
+    gap: 6px;
+}
+.tare-chip {
+    font-size: calc(0.78rem * var(--font-scale));
+    padding: 3px 8px;
+    border-radius: 12px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    color: var(--text-main);
+    transition: all 0.2s;
+}
+.tare-chip.active {
+    background: #E67E22;
+    border-color: #E67E22;
+    color: #FFFFFF;
+    font-weight: bold;
+}
+.tare-calc-hint {
+    font-size: 0.82rem;
+    color: #E67E22;
+    font-weight: normal;
+}
+.net-tag {
+    font-size: 0.9rem;
+    color: var(--accent-color);
+    font-weight: normal;
+}
+
+/* === 今日日结战报与分类汇总看板 === */
+.today-report-action {
+    margin-top: 14px;
+}
+.btn-copy-report {
+    background: linear-gradient(135deg, #0F5A3E, #1A7A56);
+    color: #FFFFFF;
+    text-align: center;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: calc(0.95rem * var(--font-scale));
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(15, 90, 62, 0.2);
+}
+.btn-copy-report:active {
+    opacity: 0.9;
+    transform: scale(0.99);
+}
+
+.today-summary-box {
+    margin-top: 15px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.today-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: #EDF2F7;
+    cursor: pointer;
+}
+.today-summary-title {
+    font-size: calc(0.9rem * var(--font-scale));
+    font-weight: bold;
+    color: var(--text-main);
+}
+.today-summary-arrow {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+.today-summary-content {
+    padding: 6px 12px 10px;
+}
+.summary-table-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px dashed #E2E8F0;
+    font-size: calc(0.85rem * var(--font-scale));
+}
+.summary-table-row:last-child {
+    border-bottom: none;
+}
+.summary-header-row {
+    font-weight: bold;
+    color: var(--text-muted);
+    border-bottom: 1px solid #CBD5E1;
+}
+.st-cell {
+    text-align: center;
+}
+.st-name { flex: 2; text-align: left; }
+.st-weight { flex: 2; }
+.st-price { flex: 1.5; color: var(--text-muted); }
+.st-money { flex: 2; text-align: right; font-weight: bold; color: var(--primary-color); }
+
+.btn-history-reuse {
+    background: #FEF3C7;
+    color: #B45309;
+    border: 1px solid #FDE68A;
+}
+.btn-history-reuse:active {
+    background: #FDE68A;
+}
+
+/* === 老板收款码弹窗 === */
+.pay-qr-overlay {
+    z-index: 10000;
+}
+.pay-qr-card {
+    background: #FFFFFF;
+    border-radius: 20px;
+    width: 320px;
+    max-width: 90vw;
+    padding: 20px;
+    box-shadow: var(--shadow-md);
+    animation: slideUp 0.25s ease-out;
+    text-align: center;
+}
+.pay-qr-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.pay-qr-title {
+    font-size: calc(1.15rem * var(--font-scale));
+    font-weight: bold;
+    color: var(--primary-color);
+}
+.pay-qr-close {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #F1F5F9;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+.pay-qr-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+}
+.pay-qr-image {
+    width: 240px;
+    height: 240px;
+    border-radius: 12px;
+    border: 1px solid #E2E8F0;
+    margin-bottom: 10px;
+}
+.pay-qr-hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.pay-qr-empty {
+    border: 2px dashed #CBD5E1;
+    border-radius: 16px;
+    padding: 30px 16px;
+    background: #F8FAFC;
+    cursor: pointer;
+}
+.pay-qr-empty:active {
+    background: #F1F5F9;
+}
+.pay-qr-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+.pay-qr-action-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: #F1F5F9;
+    color: var(--text-main);
+    text-align: center;
+}
+.pay-qr-action-btn.delete-btn {
+    color: var(--danger-color);
+    background: var(--danger-light);
+}
+
