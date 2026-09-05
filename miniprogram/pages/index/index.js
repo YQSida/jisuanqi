@@ -1075,7 +1075,7 @@ Page({
                 content: `本次实结 ￥${finalSum.toFixed(2)}${discount !== 0 ? ` (优惠￥${discount.toFixed(2)})` : ''}，是否生成并查看电子回收小票？`,
                 confirmText: '查看小票',
                 cancelText: '完成',
-                confirmColor: '#0F5A3E',
+                confirmColor: '#059669',
                 success: (mRes) => {
                     if (mRes.confirm) {
                         this.generateReceipt(record);

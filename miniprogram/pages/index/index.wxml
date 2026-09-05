@@ -1,5 +1,5 @@
 <!-- 整个页面的容器，用于支持全局变量注入 -->
-<view class="container" style="--font-scale: {{fontScale}}; padding-top: calc(env(safe-area-inset-top) + 10px); padding-bottom: calc(80px + env(safe-area-inset-bottom, 20px));">
+<view class="container" style="--font-scale: {{fontScale}}; padding-top: 6px; padding-bottom: calc(72px + env(safe-area-inset-bottom, 20px));">
     
     <!-- 云端同步加载中遮罩 -->
     <view class="cloud-loading-overlay" wx:if="{{isCloudSyncing}}">
@@ -35,7 +35,7 @@
         <view class="main-split">
             <!-- 左侧品类面板 -->
             <scroll-view class="left-panel" scroll-y enhanced="{{true}}" show-scrollbar="{{false}}">
-                <view class="section-title">
+                <view class="section-title cat-section-title">
                     <text>废品品类</text>
                     <view class="manage-btn" bindtap="openManageCatModal">⚙️</view>
                 </view>
@@ -45,7 +45,7 @@
                           bindtap="selectCategory" data-id="{{item.id}}">
                         <view class="edit-price-icon" catchtap="openEditPriceModal" data-id="{{item.id}}">✏️</view>
                         <view class="cat-name">{{item.name}}</view>
-                        <view class="cat-price">{{unit === 'kg' ? item.displayPriceKg : item.displayPriceJin}} 元/{{unit === 'jin' ? '斤' : '公斤'}}</view>
+                        <view class="cat-price">{{unit === 'kg' ? item.displayPriceKg : item.displayPriceJin}} <text class="cat-unit">元/{{unit === 'jin' ? '斤' : '公斤'}}</text></view>
                     </view>
                 </view>
             </scroll-view>
@@ -54,56 +54,58 @@
             <scroll-view class="right-panel" scroll-y enhanced="{{true}}" show-scrollbar="{{false}}">
                 <!-- 临时清单区 -->
                 <view id="invoice-card" class="invoice-card" wx:if="{{currentInvoice.length > 0}}">
-                    <view class="section-title" style="margin-top:0;">当前清单</view>
+                    <view class="section-title invoice-card-title">
+                        <text>当前清单</text>
+                        <text class="invoice-count-badge">{{currentInvoice.length}}项</text>
+                    </view>
                     <scroll-view class="invoice-list" scroll-y="true">
                         <view class="invoice-item" wx:for="{{currentInvoice}}" wx:key="id">
                             <view class="item-info">
                                 <view class="item-name">
-                                    {{item.catName}} <text style="font-size:0.8rem;color:#E74C3C;">(￥{{item.unitPriceDisplay}})</text>
+                                    {{item.catName}} <text class="item-unit-price">￥{{item.unitPriceDisplay}}/{{item.unit}}</text>
                                 </view>
                                 <view class="item-detail">
-                                    <text>{{item.weight}}{{item.unit}}</text>
+                                    <text class="item-weight-val">{{item.weight}}{{item.unit}}</text>
                                     <text class="item-tare-tag" wx:if="{{item.tareWeight > 0}}">(皮{{item.tareWeight}})</text>
-                                    <text> = {{item.totalDisplay}}元</text>
                                 </view>
                             </view>
                             <view class="item-right">
                                 <view class="item-total">￥{{item.totalDisplay}}</view>
-                                <view class="btn-del-item" bindtap="removeInvoiceItem" data-id="{{item.id}}">🗑</view>
+                                <view class="btn-del-item" bindtap="removeInvoiceItem" data-id="{{item.id}}">✕</view>
                             </view>
                         </view>
                     </scroll-view>
 
                     <!-- 抹零/优惠选择条 -->
                     <view class="discount-bar">
-                        <view class="discount-title">抹零折让：</view>
-                        <view class="discount-chips">
+                        <view class="discount-title">抹零：</view>
+                        <scroll-view class="discount-scroll" scroll-x enable-flex enhanced="{{true}}" show-scrollbar="{{false}}">
                             <view class="discount-chip {{discountMode === 'none' ? 'active' : ''}}" bindtap="setDiscountMode" data-mode="none">原价</view>
                             <view class="discount-chip {{discountMode === 'fen' ? 'active' : ''}}" bindtap="setDiscountMode" data-mode="fen">抹分</view>
                             <view class="discount-chip {{discountMode === 'jiao' ? 'active' : ''}}" bindtap="setDiscountMode" data-mode="jiao">抹角</view>
                             <view class="discount-chip {{discountMode === 'round' ? 'active' : ''}}" bindtap="setDiscountMode" data-mode="round">凑整</view>
                             <view class="discount-chip {{discountMode === 'custom' ? 'active' : ''}}" bindtap="setDiscountMode" data-mode="custom">改实付</view>
-                        </view>
+                        </scroll-view>
                     </view>
 
                     <view class="invoice-summary">
                         <view class="sum-left">
-                            <view class="sum-label">实结总额：</view>
+                            <view class="sum-label">实结总额</view>
                             <view class="sum-discount-tag" wx:if="{{discountAmount !== 0}}">
-                                原价￥{{invoiceOriginalSumDisplay}} (让利￥{{discountAmountDisplay}})
+                                原价￥{{invoiceOriginalSumDisplay}} 让利￥{{discountAmountDisplay}}
                             </view>
                         </view>
-                        <view class="sum-value">￥{{invoiceSumDisplay}}</view>
+                        <view class="sum-value"><text class="sum-currency">￥</text>{{invoiceSumDisplay}}</view>
                     </view>
                     <view class="btn-settle" hover-class="btn-settle-active" bindtap="settleInvoice">
-                        确认结算
+                        确认结算 · ￥{{invoiceSumDisplay}}
                     </view>
                 </view>
                 <!-- 空清单状态 -->
                 <view class="empty-invoice-state" wx:else>
-                    <view style="font-size: 2rem; margin-bottom: 10px;">🧾</view>
-                    <view>暂无交易清单</view>
-                    <view style="font-size: 0.85rem; opacity: 0.7; margin-top: 5px;">请点击左侧品类开始记账</view>
+                    <view style="font-size: 2.2rem; margin-bottom: 8px;">🧾</view>
+                    <view style="font-weight:600; color:var(--text-main);">暂无交易清单</view>
+                    <view style="font-size: 0.82rem; color:var(--text-muted); margin-top: 4px;">点击左侧品类即可开始计重算账</view>
                 </view>
             </scroll-view>
         </view>

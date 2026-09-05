@@ -96,7 +96,7 @@ function drawQRCode(ctx, x, y, size) {
     const centerY = y + (size - centerSize) / 2;
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(centerX - 1, centerY - 1, centerSize + 2, centerSize + 2);
-    ctx.fillStyle = '#0F5A3E';
+    ctx.fillStyle = '#059669';
     ctx.fillRect(centerX, centerY, centerSize, centerSize);
     ctx.fillStyle = '#FFFFFF';
     ctx.font = `bold ${Math.floor(unit * 2.6)}px sans-serif`;
@@ -220,14 +220,14 @@ function renderReceipt(canvas, options) {
     ctx.fillRect(0, 0, width, height);
 
     // 顶部复古绿色条带
-    ctx.fillStyle = '#0F5A3E';
+    ctx.fillStyle = '#059669';
     ctx.fillRect(0, 0, width, 8);
 
     const paddingX = 22;
     let currY = 32;
 
     // 2. 标题区
-    ctx.fillStyle = '#0F5A3E';
+    ctx.fillStyle = '#059669';
     ctx.font = 'bold 20px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
@@ -344,7 +344,7 @@ function renderReceipt(canvas, options) {
     ctx.font = 'bold 14px sans-serif';
     ctx.fillText('实结总额：', paddingX, currY);
 
-    ctx.fillStyle = '#0F5A3E';
+    ctx.fillStyle = '#059669';
     ctx.font = 'bold 24px sans-serif';
     ctx.fillText(`￥${totalMoney}`, paddingX + 75, currY - 2);
 

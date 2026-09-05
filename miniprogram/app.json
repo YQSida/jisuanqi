@@ -3,9 +3,9 @@
     "pages/index/index"
   ],
   "window": {
-    "backgroundColor": "#F5F7FA",
+    "backgroundColor": "#F4F8F5",
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#0F5A3E",
+    "navigationBarBackgroundColor": "#059669",
     "navigationBarTitleText": "摊友称重计价助手",
     "navigationBarTextStyle": "white"
   },
